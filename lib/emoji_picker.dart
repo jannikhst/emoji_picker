@@ -119,6 +119,7 @@ class EmojiPicker extends StatefulWidget {
     this.noRecentsStyle,
     this.categoryIcons,
     this.buttonMode = ButtonMode.MATERIAL,
+    this.emojiStyle,
     //this.unavailableEmojiIcon,
   }) : super(key: key) {
     if (selectedCategory == null) {
