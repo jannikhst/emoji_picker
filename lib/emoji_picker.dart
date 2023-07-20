@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'dart:math';
 import 'emoji_lists.dart' as emojiList;
 
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 /// All the possible categories that [Emoji] can be put into
 ///
@@ -342,59 +342,11 @@ class _EmojiPickerState extends State<EmojiPicker> {
     }
   }
 
-  Future<List<String>> getRecentEmojis() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final key = "recents";
-    recentEmojis = prefs.getStringList(key) ?? [];
-    return recentEmojis;
-  }
-
-  void addRecentEmoji(Emoji emoji) async {
-    final prefs = await SharedPreferences.getInstance();
-    final key = "recents";
-    getRecentEmojis().then((_) {
-      print("adding emoji");
-      setState(() {
-        recentEmojis.insert(0, emoji.name);
-        prefs.setStringList(key, recentEmojis);
-      });
-    });
-  }
-
   Future<Map<String, String>> getAvailableEmojis(Map<String, String> map,
       {required String title}) async {
     Map<String, String>? newMap;
-
-    newMap = await restoreFilteredEmojis(title);
-
-    if (newMap != null) {
-      return newMap;
-    }
-
     newMap = (await _getFiltered(map))!;
-
-    await cacheFilteredEmojis(title, newMap);
-
     return newMap;
-  }
-
-  Future<void> cacheFilteredEmojis(
-      String title, Map<String, String>? emojis) async {
-    final prefs = await SharedPreferences.getInstance();
-    String emojiJson = jsonEncode(emojis);
-    prefs.setString(title, emojiJson);
-    return;
-  }
-
-  Future<Map<String, String>?> restoreFilteredEmojis(String title) async {
-    final prefs = await SharedPreferences.getInstance();
-    String? emojiJson = prefs.getString(title);
-    if (emojiJson == null) {
-      return null;
-    }
-    Map<String, String> emojis =
-        Map<String, String>.from(jsonDecode(emojiJson));
-    return emojis;
   }
 
   Future updateEmojis() async {
@@ -568,9 +520,6 @@ class _EmojiPickerState extends State<EmojiPicker> {
                                   name: recommended.name!,
                                   emoji: recommended.emoji),
                               widget.selectedCategory);
-                          addRecentEmoji(Emoji(
-                              name: recommended.name!,
-                              emoji: recommended.emoji));
                         },
                       ));
                     case ButtonMode.CUPERTINO:
@@ -594,9 +543,6 @@ class _EmojiPickerState extends State<EmojiPicker> {
                                   name: recommended.name!,
                                   emoji: recommended.emoji),
                               widget.selectedCategory);
-                          addRecentEmoji(Emoji(
-                              name: recommended.name!,
-                              emoji: recommended.emoji));
                         },
                       ));
                     default:
@@ -1212,9 +1158,6 @@ class _EmojiPickerState extends State<EmojiPicker> {
         ),
       ));
     }
-
-    pages.addAll(recommendedPages);
-    pages.addAll(recentPages);
     pages.addAll(smileyPages);
     pages.addAll(animalPages);
     pages.addAll(foodPages);
@@ -1223,12 +1166,6 @@ class _EmojiPickerState extends State<EmojiPicker> {
     pages.addAll(objectPages);
     pages.addAll(symbolPages);
     pages.addAll(flagPages);
-
-    getRecentEmojis().then((_) {
-      pages.removeAt(recommendedPagesNum);
-      pages.insert(recommendedPagesNum, recentPage());
-      if (mounted) setState(() {});
-    });
   }
 
   Widget recentPage() {
