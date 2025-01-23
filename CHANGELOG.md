@@ -1,3 +1,6 @@
+## [0.1.1] - 01/23/2025
+* Fixed Incorrect package="com.jeffg.emoji_picker" found in source AndroidManifest.xml
+
 ## [0.1.0] - 09/01/2020
 * Added documentation
 
